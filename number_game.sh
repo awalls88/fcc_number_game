@@ -36,7 +36,7 @@ USERNAME_QUERY () {
       ##user found
       NUMBER_GAMES=$($PSQL "SELECT played_games FROM number_guess WHERE username = '$USERNAME'")
       BEST_GAME=$($PSQL "SELECT best_game FROM number_guess WHERE username = '$USERNAME'")
-      echo -e "Welcome back, $USERNAME! You have played $NUMBER_GAMES games, and you best game took $BEST_GAME guesses." 
+      echo -e "\nWelcome back, $RETURN_USER! You have played $NUMBER_GAMES games, and your best game took $BEST_GAME guesses." 
       TRIES=0
       GUESS
     fi
@@ -52,30 +52,31 @@ GUESS (){
     #not an integer
     if [[ ! $INPUT =~ ^[0-9]+$ ]]
       then
-        echo -e "\nThat is not an integer, guess again:\n"
+        echo -e "That is not an integer, guess again:\n"
         GUESS
       elif [[ $INPUT -lt $RANDOM_NUMBER ]]
       then
-        echo -e "\nIt's higher than that, guess again:\n"
+        echo -e "It's higher than that, guess again:\n"
         TRIES=$((TRIES+1))
         GUESS
       elif [[ $INPUT -gt $RANDOM_NUMBER ]]
       then
-        echo -e "\nIt's lower than that, guess again:\n"
+        echo -e "It's lower than that, guess again:\n"
         TRIES=$((TRIES+1))
         GUESS
       else
         TRIES=$((TRIES+1))
         NUMBER_GAMES=$((NUMBER_GAMES+1))
-        echo "You guessed it in $TRIES tries. The secret number was $RANDOM_NUMBER. Nice job!"
-    fi
-    if [[ -z $BEST_GAME || $BEST_GAME > $TRIES ]] 
-      then
-      # update best game and total games
+        echo -e "\nYou guessed it in $TRIES tries. The secret number was $RANDOM_NUMBER. Nice job!"
+        if [[ -z $BEST_GAME || $BEST_GAME > $TRIES ]] 
+          then
+            # update best game and total games
             UPDATE_USER_RESULT="$($PSQL "UPDATE number_guess SET played_games = $NUMBER_GAMES, best_game = $TRIES WHERE username = '$USERNAME'")"
-      else 
-      # otherwise only update total games
-      UPDATE_USER_RESULT="$($PSQL "UPDATE number_guess SET played_games = $NUMBER_GAMES WHERE username = '$USERNAME'")"
-    fi
+          else 
+            # otherwise only update total games
+            UPDATE_USER_RESULT="$($PSQL "UPDATE number_guess SET played_games = $NUMBER_GAMES WHERE username = '$USERNAME'")"
+         fi
+        fi
+    exit 0
 }
 USERNAME
