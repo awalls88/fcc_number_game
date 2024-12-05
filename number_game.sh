@@ -53,6 +53,7 @@ GUESS (){
     if [[ ! $INPUT =~ ^[0-9]+$ ]]
       then
         echo -e "That is not an integer, guess again:\n"
+        TRIES=$((TRIES+1))
         GUESS
       elif [[ $INPUT -lt $RANDOM_NUMBER ]]
       then
